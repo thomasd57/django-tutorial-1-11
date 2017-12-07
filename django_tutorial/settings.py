@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -74,22 +76,22 @@ WSGI_APPLICATION = 'django_tutorial.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-         'ENGINE': 'sql_server.pyodbc',
-         'NAME': os.environ['RDS_NAME'],
-         'USER': os.environ['RDS_USER'],
-         'PASSWORD': os.environ['RDS_PASSWORD'],
-         'HOST': os.environ['RDS_HOST'],
-         'PORT': '',
-         'OPTIONS': {
-             'driver': 'ODBC Driver 13 for SQL Server',
-             'MARS_Connection': 'True',
-         }
+# So that we can run collectistatic without worring about database setup
+if not (len(sys.argv) > 1 and sys.argv[1] == 'collectstatic'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'sql_server.pyodbc',
+            'NAME': os.environ['RDS_NAME'],
+            'USER': os.environ['RDS_USER'],
+            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'HOST': os.environ['RDS_HOST'],
+            'PORT': '',
+            'OPTIONS': {
+                'driver': 'ODBC Driver 13 for SQL Server',
+                'MARS_Connection': 'True',
+            }
+        }
     }
-}
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
