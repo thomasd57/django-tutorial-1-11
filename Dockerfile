@@ -1,14 +1,15 @@
-FROM python:3
+FROM ubuntu:16.04
 
 WORKDIR /var/app
+COPY ./setup-server.sh run-server.sh manage.py requirements.txt ./
 
-COPY requirements.txt ./
-RUN pip install -U pip -r requirements.txt && pip install gunicorn
+RUN ./setup-server.sh
 
-COPY manage.py runserver.sh ./
 COPY django_tutorial ./django_tutorial/
 COPY polls ./polls/
 
+RUN pip install -U pip -r requirements.txt && pip install gunicorn
+
 EXPOSE 8000
 
-CMD ["./runserver.sh"]
+CMD ["./run-server.sh"]
