@@ -76,10 +76,19 @@ WSGI_APPLICATION = 'django_tutorial.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+         'ENGINE': 'sql_server.pyodbc',
+         'NAME': os.environ['RDS_NAME'],
+         'USER': os.environ['RDS_USER'],
+         'PASSWORD': os.environ['RDS_PASSWORD'],
+         'HOST': os.environ['RDS_HOST'],
+         'PORT': '',
+         'OPTIONS': {
+             'driver': 'ODBC Driver 13 for SQL Server',
+             'MARS_Connection': 'True',
+         }
     }
 }
+
 
 
 # Password validation
