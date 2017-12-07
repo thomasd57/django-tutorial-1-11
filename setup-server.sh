@@ -16,6 +16,3 @@ apt-get install -y python3-pip
 update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 update-alternatives --install /usr/bin/pip pip /usr/bin/pip3  10
 
-# Install required django packages
-pip install -U pip -r requirements.txt 
-pip install gunicorn
