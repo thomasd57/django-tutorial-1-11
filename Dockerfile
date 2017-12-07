@@ -5,10 +5,9 @@ WORKDIR /var/app
 COPY requirements.txt ./
 RUN pip install -U pip -r requirements.txt && pip install gunicorn
 
-COPY manage.py db.sqlite3 runserver.sh ./
+COPY manage.py runserver.sh ./
 COPY django_tutorial ./django_tutorial/
 COPY polls ./polls/
-COPY static ./static/
 
 EXPOSE 8000
 
