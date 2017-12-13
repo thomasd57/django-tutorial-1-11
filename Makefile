@@ -6,6 +6,7 @@ run_azure:
 
 build:
 	docker build -t polls .
+	docker tag polls ampervuecontainers.azurecr.io/ampervue-polls
 
 build_azure:
 	docker build -t azure -f Dockerfile.azure .

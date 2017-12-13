@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/bin/bash -x
+
+az acr login --name AmpervueContainer
+az acr update --name AmpervueContainers --admin-enabled true
 
 # put all env variables on a single line
 vars="$(sed -e :a -e '$!N; s/\n/ /; ta' secrets.env)"
@@ -8,8 +11,6 @@ password=$(az acr credential show -n AmpervueContainers -o table | awk '$1 == "A
 echo "password=$password"
 login_server=$(az acr list -o table | awk '$1 == "AmpervueContainers" { print $5; }')
 echo "login_server=$login_server"
-
-docker tag polls ampervuecontainers.azurecr.io/ampervue-polls
 
 az container create --name polls \
     --image ampervuecontainers.azurecr.io/ampervue-polls \
