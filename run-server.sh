@@ -12,7 +12,7 @@ tail -n 0 -f /var/logs/gunicorn*.log &
 export DJANGO_SETTINGS_MODULE=django_tutorial.settings
 exec gunicorn django_tutorial.wsgi:application \
      --name django_tutorial \
-     --bind 0.0.0.0:8000 \
+     --bind 0.0.0.0:80 \
      --workers 5 \
      --log-level=info \
      --log-file=/var/logs/gunicorn.log \
