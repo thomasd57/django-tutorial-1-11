@@ -12,6 +12,6 @@ RUN pip install -U pip -r requirements.txt \
 
 RUN python manage.py collectstatic
 
-EXPOSE 8000
+EXPOSE 80
 
 CMD ["./run-server.sh"]
