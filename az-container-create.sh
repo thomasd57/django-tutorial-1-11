@@ -1,10 +1,11 @@
 #!/bin/bash -x
 
-az acr login --name AmpervueContainer
+az acr login --name AmpervueContainers
 az acr update --name AmpervueContainers --admin-enabled true
 
 # put all env variables on a single line
 vars="$(sed -e :a -e '$!N; s/\n/ /; ta' secrets.env)"
+echo $vars
 
 # get the registry password
 password=$(az acr credential show -n AmpervueContainers -o table | awk '$1 == "AmpervueContainers" { print $2; }')
