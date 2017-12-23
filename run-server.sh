@@ -1,5 +1,7 @@
 #!/bin/bash
 
+service ssh start
+
 cd /var/app
 export PYTHONPATH=/var/app:$PYTHONPATH
 
@@ -13,7 +15,7 @@ export DJANGO_SETTINGS_MODULE=django_tutorial.settings
 exec gunicorn django_tutorial.wsgi:application \
      --name django_tutorial \
      --bind 0.0.0.0:80 \
-     --workers 5 \
+     --workers 4 \
      --log-level=info \
      --log-file=/var/logs/gunicorn.log \
      --access-logfile=/var/logs/gunicorn-access.log \
