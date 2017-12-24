@@ -18,7 +18,9 @@ RUN apt-get install -y python3-pip \
  && update-alternatives --install /usr/bin/python python /usr/bin/python3 10 \
  && update-alternatives --install /usr/bin/pip pip /usr/bin/pip3  10
 
-EXPOSE 2222
+RUN pip3 install -U pip
+
+EXPOSE 22
 
 COPY sshd_config /etc/ssh/
 WORKDIR /root

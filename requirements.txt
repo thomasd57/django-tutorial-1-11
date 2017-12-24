@@ -1,4 +1,6 @@
 Django==1.11
 django-pyodbc-azure==1.11.0.0
+gunicorn==19.7.1
 pyodbc==4.0.21
 pytz==2017.3
+whitenoise==3.3.1
