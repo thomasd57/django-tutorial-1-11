@@ -1,26 +1,69 @@
-This repo contains 
-a) django 'polls' tutorial 
-b) Dockerfiles to build docker image to run server to serve the application
+# Introduction
 
-Dockerfiles are split in two, because it is anticipated that the first one will not be changing
+This repository contains django _polls_ tutorial, developed with django 1.11, to be used on Microsoft Azure
 
-The base docker file docker-azure/Dockerfile installs sshd, so that it is possible to ssh to a running container.
+1. Database is configured to use Azure SQL
+2. Deployment to Azure is achieved with docker using Azure Container Instances and Azure Container Registry.
+3. Docker is configured for remote SSH access using ssh keys.
 
-1. create azure docker image:
-> docker build -f Dockerfile.azure -t azure .
+# Workflow
 
-2. create server docker image
-> docker build -t server .
+1. You should have an Azure account and set up Azure SQL database, this is outside of this tutorial.
+2. Prepare a file secrets.env with the following settings:
 
-3. decrypt secrets file and ssh key
-> gpg secrets.env.gpg
-> gpg docker-azure/id_rsa
-> chmod 600 docker-azure/id_rsa
+    RDS_NAME=<name of the database>
+    RDS_USE=<userid to log in the database>
+    RDS_PASSWORD=<database password>
+    RDS_HOST=<host name for the database>
 
-4. run server in the docker container
-> docker run --env-file secrets.env -p 8000:80 -p 2222:22 polls
+Check the file `django_tutorial/settings.py` how these variables are used. 
 
-5. You can ssh into the container
-> ssh -p 2222 -i docker-azure/id_rsa root@127.0.0.1
+3. Set python virtual environment and the environment variables listed in point 2. to verify that the server works 
+correctly locally. The database will be empty, you can use admin interface to add a quiz.
 
-Make sure to adjust firewall rules if you want to ssh from a remote machine
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+    manage.py migrate
+    manage.py runserver 0:8000
+
+Point the browser to http://127.0.0.1:8000.
+
+4. Verify that server works locally using _production_ mode, i.e. starting django app via wsgi.py and gunicorn. You will need to first collect statics
+
+    manage.py collectstatic
+    run-server.sh
+
+Point the browser to http://127.0.0.1:8000. Any database changes you did in step 3. should still work.
+
+5. Prepare ssh keys for logging into docker container.
+
+    ssh-keygen -t rsa -N '' -f azure-docker/id_rsa
+
+5. Create base _azure_ django container
+
+    docker build -t azure docker-azure
+
+6. Build the final docker image. We are splitting docker images into two, because the second one (polls) would be 
+rebult with any change to your application code. The first (azure) is generic.
+
+    docker build -t polls .
+
+7. Run the docker image locally and check that you can ssh to it:
+
+    docker run --env-file secrets.env -p 8000:80 -p 2222:20 polls /bin/bash
+    ssh -i docker-azure/id_rsa -p 2222 root@127.0.0.1
+
+Point the browser to http://127.0.0.1:8000 to verify that it works.
+
+8. Push the image to Azure Container Registry and run container. You will need first to create Azure Container Registry.
+
+    docker tag polls $registry.azurecr.io/polls
+    az-container-create.sh $registry $resource_group
+
+9. You can now ssh into container on Azure, after it was created.
+
+    az container list # Check if the container is created and find IP address
+    ssh -i docker-azure/id_rsa root@<ipaddress>
+
+10. Verify that the container works, by pointing the browser to the container IP.
