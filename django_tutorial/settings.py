@@ -78,20 +78,24 @@ WSGI_APPLICATION = 'django_tutorial.wsgi.application'
 
 # So that we can run collectistatic without worring about database setup
 if not (len(sys.argv) > 1 and sys.argv[1] == 'collectstatic'):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'sql_server.pyodbc',
-            'NAME': os.environ['RDS_NAME'],
-            'USER': os.environ['RDS_USER'],
-            'PASSWORD': os.environ['RDS_PASSWORD'],
-            'HOST': os.environ['RDS_HOST'],
-            'PORT': '',
-            'OPTIONS': {
-                'driver': 'ODBC Driver 13 for SQL Server',
-                'MARS_Connection': 'True',
+    try:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'sql_server.pyodbc',
+                'NAME': os.environ['RDS_NAME'],
+                'USER': os.environ['RDS_USER'],
+                'PASSWORD': os.environ['RDS_PASSWORD'],
+                'HOST': os.environ['RDS_HOST'],
+                'PORT': '',
+                'OPTIONS': {
+                    'driver': 'ODBC Driver 13 for SQL Server',
+                    'MARS_Connection': 'True',
+                }
             }
         }
-    }
+    except KeyError:
+        print('RDS_NAME, RDS_USER, RDS_PASSWORD and RDS_HOST environment variables must be set')
+        sys.exit(1)
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators

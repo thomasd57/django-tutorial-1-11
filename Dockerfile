@@ -1,4 +1,4 @@
-FROM azure
+FROM polls-base
 
 WORKDIR /var/app
 RUN touch .in_docker
@@ -9,9 +9,6 @@ COPY polls           ./polls/
 COPY templates       ./templates/
 
 RUN pip install -r requirements.txt
-RUN python manage.py collectstatic
-
-EXPOSE 80 
-EXPOSE 22
+RUN python3 manage.py collectstatic
 
 CMD ["./run-server.sh"]
