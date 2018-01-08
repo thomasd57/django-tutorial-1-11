@@ -5,6 +5,7 @@ This repository contains django _polls_ tutorial, developed with django 1.11, to
 1. Database is configured to use Azure SQL
 2. Deployment to Azure is achieved with docker using Azure Container Instances and Azure Container Registry.
 3. Docker is configured for remote SSH access using ssh keys.
+4. Application is started with gunicorn, running behind nginx front-end. Nginx terminates SSL.
 
 # Workflow
 
@@ -36,34 +37,33 @@ run-server.sh
 ```
 Point the browser to http://127.0.0.1:8000. Any database changes you did in step 3. should still work.
 
-5. Prepare ssh keys for logging into docker container.
+5. Prepare SSH and SSL keys for logging into docker container.
 ```
-ssh-keygen -t rsa -N '' -f azure-docker/id_rsa
+gen-keys.sh
 ```
-5. Create base _azure_ django container
+5. Create base _polls-base_ django container
 ```
-docker build -t azure docker-azure
+docker build -t polls-base polls-base
 ```
 6. Build the final docker image. We are splitting docker images into two, because the second one (polls) would be 
-rebult with any change to your application code. The first (azure) is generic.
+rebult with any change to your application code. The first (polls-base) is generic.
 ```
 docker build -t polls .
 ```
 7. Run the docker image locally and check that you can ssh to it:
 ```
-docker run --env-file secrets.env -p 8000:80 -p 2222:20 polls /bin/bash
-ssh -i docker-azure/id_rsa -p 2222 root@127.0.0.1
+docker-run.ssh
+ssh -i polls-base/id_rsa -p 2222 root@127.0.0.1
 ```
-Point the browser to http://127.0.0.1:8000 to verify that it works.
+Point the browser to http://127.0.0.1 to verify that it works.
 
 8. Push the image to Azure Container Registry and run container. You will need first to create Azure Container Registry.
 ```
-docker tag polls $registry.azurecr.io/polls
-az-container-create.sh $registry $resource_group
+az-container-create.sh
 ```
 9. You can now ssh into container on Azure, after it was created.
 ```
-az container list # Check if the container is created and find IP address
-ssh -i docker-azure/id_rsa root@<ipaddress>
+az container list -o table # Check if the container is created and find IP address
+ssh -i polls-base/keys/id_rsa root@<ipaddress>
 ```
 10. Verify that the container works, by pointing the browser to the container IP.
