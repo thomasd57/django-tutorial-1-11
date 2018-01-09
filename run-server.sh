@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Start gunicorn. It can be called directly or in docker, where it sits behind nginx
+# Start application with gunicorn. It can be called directly or in docker, where it sits behind nginx
 
 bind_addr=0:8000
 # If we are running inside docker, start sshd and nginx
@@ -20,7 +20,7 @@ export DJANGO_SETTINGS_MODULE=django_tutorial.settings
 exec gunicorn django_tutorial.wsgi:application \
      --name django_tutorial \
      --bind $bind_addr \
-     --workers 4 \
+     --workers 2 \
      --log-level=info \
      --log-file=logs/gunicorn.log \
      --access-logfile=logs/gunicorn-access.log \
