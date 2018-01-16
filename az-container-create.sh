@@ -1,8 +1,7 @@
-#!/bin/bash -x
+#!/bin/bash
 
 image_name=${1:?Usage: $0 IMAGE [CONTAINER]}
 container_name=${2:-$image_name}
-
 
 # Read environment variables
 vars=( $(cat secrets.env) )
@@ -13,13 +12,18 @@ resource_group=$(az acr list --query '[0].resourceGroup' | sed -e 's/"//g')
 registry=$(az acr list --query '[0].name' | sed -e 's/"//g' | tr A-Z a-z)
 login_server=$(az acr list --query '[0].loginServer' | sed -e 's/"//g')
 az acr login --name $registry
-# This is required once, but is fast, so we do it all the time
+# This is required only once, but is fast, so we do it all the time
 az acr update --name $registry --admin-enabled true
 
-docker tag $image_name $registry.azurecr.io/$image_name
-docker push $registry.azurecr.io/$image_name
+# Using tag to guarantee that this replaces any existing container
+# Right now Azure doesn't replace the container generated from the same image.
+# RANDOM is there to be able to use same git hash (with local changes)
+tag=$(git rev-parse --short HEAD)-$((RANDOM % 100))
+docker tag $image_name $registry.azurecr.io/$image_name:$tag
+docker push $registry.azurecr.io/$image_name:$tag
+set -x
 az container create --name $container_name \
-    --image $registry.azurecr.io/$image_name \
+    --image $registry.azurecr.io/$image_name:$tag \
     --resource-group $resource_group \
     --cpu 1 \
     --environment-variables ${vars[@]} \

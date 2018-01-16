@@ -24,6 +24,7 @@ RUN apt-get install -y software-properties-common \
  && add-apt-repository -y ppa:certbot/certbot \
  && apt-get update \
  && apt-get install -y python-certbot-nginx
+RUN mkdir -p /var/www/letsencrypt
 
 # SSHD config and keys
 COPY sshd.conf /etc/ssh/sshd_config
